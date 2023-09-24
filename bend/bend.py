@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 
-def execute_bendsql(query):
+def execute_sql(query):
     command = [
         'bendsql',
         '-q', query,
@@ -38,15 +38,15 @@ def main():
 
     with open('query_results.txt', 'w') as result_file:
         for index, query in enumerate(queries):
-            print(f"Executing SQL-{index}: {query}")
-            output = execute_bendsql(query)
+            print(f"Executing SQL-{index + 1}: {query}")
+            output = execute_sql(query)
 
             if output:
                 time_elapsed = extract_time(output)
                 if time_elapsed:
                     print(f"Time Elapsed: {time_elapsed}s\n")
                     result_file.write(f"SQL: {query}\nTime Elapsed: {time_elapsed}s\n\n")
-                    results.append(f"{index + 1}|{time_elapsed}")
+                    results.append(f"{time_elapsed}")
                 else:
                     print("Could not extract time from output.\n")
                     result_file.write(f"SQL: {query}\nTime Elapsed: Unknown\n\n")
