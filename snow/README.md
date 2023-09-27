@@ -2,10 +2,14 @@
 
 https://docs.snowflake.com/en/user-guide/snowsql
 
-# config
+# Config
 
 Config as snowsql_config to  `~/.snowsql/config`
 
-# run
+# Preapre
+
+[prepare.sql](prepare.sql)
+
+# Run
 
 python3 ./snow.py

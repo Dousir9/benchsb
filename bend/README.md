@@ -2,11 +2,16 @@
 
 https://github.com/datafuselabs/bendsql
 
-# config
+# Config
 
 ```
 export BENDSQL_DSN="databend://<user>:<pwd>@<host>:443/<database>"
 ```
-# run
+
+# Preapre
+
+[prepare.sql](prepare.sql)
+
+# Run
 
 python3 ./bend.py

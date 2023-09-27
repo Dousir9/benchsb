@@ -1,58 +1,51 @@
 import subprocess
 import re
+import sys
 from pathlib import Path
 
 
 def execute_sql(query):
-    command = [
-        'bendsql',
-        '-q', query,
-        '--time'
-    ]
-    result = subprocess.run(command, text=True, capture_output=True)
-
-    if result.returncode != 0:
-        print("bendsql command failed.")
-        return None
-
-    return result.stdout
+    command = ['bendsql', '-q', query, '--time']
+    try:
+        result = subprocess.run(command, text=True, capture_output=True, check=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        sys.exit(f"bendsql command failed: {e.stderr}")
 
 
 def extract_time(output):
     match = re.search(r'([0-9.]+)$', output)
-    return match.group(1) if match else None
+    if not match:
+        raise ValueError("Could not extract time from output.")
+    return match.group(1)
 
 
 def main():
     sql_file_path = Path('./queries.sql')
     if not sql_file_path.exists():
-        print("SQL file does not exist.")
-        return
+        sys.exit("SQL file does not exist.")
 
     with open(sql_file_path, 'r') as f:
         content = f.read()
 
     queries = [query.strip() for query in content.split(';') if query.strip()]
-
-    results = []  # To store the execution time of each query
+    results = []
 
     with open('query_results.txt', 'w') as result_file:
         for index, query in enumerate(queries):
             print(f"Executing SQL-{index + 1}: {query}")
-            output = execute_sql(query)
 
-            if output:
+            try:
+                output = execute_sql(query)
                 time_elapsed = extract_time(output)
-                if time_elapsed:
-                    print(f"Time Elapsed: {time_elapsed}s\n")
-                    result_file.write(f"SQL: {query}\nTime Elapsed: {time_elapsed}s\n\n")
-                    results.append(f"{time_elapsed}")
-                else:
-                    print("Could not extract time from output.\n")
-                    result_file.write(f"SQL: {query}\nTime Elapsed: Unknown\n\n")
-                    results.append(f"{index + 1}|Unknown")
+                print(f"Time Elapsed: {time_elapsed}s\n")
+                result_file.write(f"SQL: {query}\nTime Elapsed: {time_elapsed}s\n\n")
+                results.append(f"{time_elapsed}")
+            except Exception as e:
+                print(e)
+                result_file.write(f"SQL: {query}\nTime Elapsed: Error - {e}\n\n")
+                results.append(f"{index + 1}|Error")
 
-    # Print overall execution results after executing all queries
     print("Overall Execution Results:")
     for result in results:
         print(result)

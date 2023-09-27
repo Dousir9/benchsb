@@ -1,69 +1,66 @@
 import subprocess
 import re
+import sys
 from pathlib import Path
 
 
 def execute_sql(query):
+    """Executes a SQL query in Snowflake and returns the output.
+
+    If the query fails, an exception is raised with the appropriate error message.
+    """
     command = [
         'snowsql',
         '--warehouse', 'COMPUTE_WH',
         '--schemaname', 'PUBLIC',
         '--dbname', 'tpch_sf100',
-        '-q', query  # Changed from '-f' to '-q' to directly pass the query
+        '-q', query
     ]
-    result = subprocess.run(command, text=True, capture_output=True)
-
-    if result.returncode != 0:
-        print(f"snowsql command failed with error: {result.stderr}")  # More informative error message
-        return None
-
-    return result.stdout
+    try:
+        result = subprocess.run(command, text=True, capture_output=True, check=True)
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        sys.exit(f"SQL query failed: {query}\nError: {e.stderr}")
 
 
 def extract_time(output):
+    """Extracts the execution time from the output of a SQL query."""
     match = re.search(r'Time Elapsed:\s*([0-9.]+)s', output)
-    return match.group(1) if match else None
+    if not match:
+        raise ValueError("Could not extract time from output.")
+    return match.group(1)
 
 
 def main():
-    alter_statement = "ALTER WAREHOUSE COMPUTE_WH SUSPEND;"
+    """Executes the SQL queries in the queries.sql file and measures their execution time.
+
+    The results are written to a file called query_results.txt.
+    If any query fails, the execution is stopped and the error is printed.
+    """
     sql_file_path = Path('./queries.sql')
     if not sql_file_path.exists():
-        print("SQL file does not exist.")
-        return
+        sys.exit("SQL file does not exist.")
 
     with open(sql_file_path, 'r') as f:
         content = f.read()
 
     queries = [query.strip() for query in content.split(';') if query.strip()]
-
-    results = []  # To store the execution time of each query
+    results = []
 
     with open('query_results.txt', 'w') as result_file:
         for index, query in enumerate(queries):
-            print(f"Executing SQL-{index + 1}: {query}")
-            print("Suspending warehouse...\n")
-            _ = execute_sql(alter_statement)  # Directly passed the alter_statement
-
-            print("Executing query...\n")
-            output = execute_sql(query)  # Directly passed the query
-
-            if output:
+            try:
+                print(f"Executing SQL-{index + 1}: {query}")
+                output = execute_sql(query)
                 time_elapsed = extract_time(output)
-                if time_elapsed:
-                    print(f"Time Elapsed: {time_elapsed}s\n")
-                    result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: {time_elapsed}s\n\n")
-                    results.append(f"{time_elapsed}")
-                else:
-                    print("Could not extract time from output.\n")
-                    result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: Unknown\n\n")
-                    results.append(f"SQL-{index + 1}: Unknown")
-            else:
-                print("No output from snowsql command.\n")
-                result_file.write(f"SQL-{index + 1}: {query}\nNo output\n\n")
-                results.append(f"SQL-{index + 1}: No output")
+                print(f"Time Elapsed: {time_elapsed}s\n")
+                result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: {time_elapsed}s\n\n")
+                results.append(f"{time_elapsed}")
+            except Exception as e:
+                print(e)
+                result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: Error - {e}\n\n")
+                results.append(f"{index + 1}|Error")
 
-    # Print overall execution results after executing all queries
     print("Overall Execution Results:")
     for result in results:
         print(result)
