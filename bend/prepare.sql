@@ -1,96 +1,144 @@
-create database tpch_sf100;
-use tpch_sf100;
-CREATE TABLE IF NOT EXISTS customer (
-                                        c_custkey BIGINT not null,
-                                        c_name STRING not null,
-                                        c_address STRING not null,
-                                        c_nationkey INTEGER not null,
-                                        c_phone STRING not null,
-                                        c_acctbal DECIMAL(15, 2) not null,
-    c_mktsegment STRING not null,
-    c_comment STRING not null
-    ) CLUSTER BY (c_custkey);
+CREATE DATABASE tpch_sf100;
 
+USE tpch_sf100;
+
+CREATE TABLE IF NOT EXISTS customer (
+                                        c_custkey BIGINT NOT NULL,
+                                        c_name STRING NOT NULL,
+                                        c_address STRING NOT NULL,
+                                        c_nationkey INTEGER NOT NULL,
+                                        c_phone STRING NOT NULL,
+                                        c_acctbal DECIMAL(15, 2) NOT NULL,
+    c_mktsegment STRING NOT NULL,
+    c_comment STRING NOT NULL
+    )
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS lineitem (
-                                        l_orderkey BIGINT not null,
-                                        l_partkey BIGINT not null,
-                                        l_suppkey BIGINT not null,
-                                        l_linenumber BIGINT not null,
-                                        l_quantity DECIMAL(15, 2) not null,
-    l_extendedprice DECIMAL(15, 2) not null,
-    l_discount DECIMAL(15, 2) not null,
-    l_tax DECIMAL(15, 2) not null,
-    l_returnflag STRING not null,
-    l_linestatus STRING not null,
-    l_shipdate DATE not null,
-    l_commitdate DATE not null,
-    l_receiptdate DATE not null,
-    l_shipinstruct STRING not null,
-    l_shipmode STRING not null,
-    l_comment STRING not null
-    ) CLUSTER BY(l_shipdate, l_orderkey);
+                                        l_orderkey BIGINT NOT NULL,
+                                        l_partkey BIGINT NOT NULL,
+                                        l_suppkey BIGINT NOT NULL,
+                                        l_linenumber BIGINT NOT NULL,
+                                        l_quantity DECIMAL(15, 2) NOT NULL,
+    l_extendedprice DECIMAL(15, 2) NOT NULL,
+    l_discount DECIMAL(15, 2) NOT NULL,
+    l_tax DECIMAL(15, 2) NOT NULL,
+    l_returnflag STRING NOT NULL,
+    l_linestatus STRING NOT NULL,
+    l_shipdate DATE NOT NULL,
+    l_commitdate DATE NOT NULL,
+    l_receiptdate DATE NOT NULL,
+    l_shipinstruct STRING NOT NULL,
+    l_shipmode STRING NOT NULL,
+    l_comment STRING NOT NULL
+    )
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS nation (
-                                      n_nationkey INTEGER not null,
-                                      n_name STRING not null,
-                                      n_regionkey INTEGER not null,
+                                      n_nationkey INTEGER NOT NULL,
+                                      n_name STRING NOT NULL,
+                                      n_regionkey INTEGER NOT NULL,
                                       n_comment STRING
-) CLUSTER BY (n_nationkey);
+)
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS orders (
-                                      o_orderkey BIGINT not null,
-                                      o_custkey BIGINT not null,
-                                      o_orderstatus STRING not null,
-                                      o_totalprice DECIMAL(15, 2) not null,
-    o_orderdate DATE not null,
-    o_orderpriority STRING not null,
-    o_clerk STRING not null,
-    o_shippriority INTEGER not null,
-    o_comment STRING not null
-    ) CLUSTER BY (o_orderkey, o_orderdate);
+                                      o_orderkey BIGINT NOT NULL,
+                                      o_custkey BIGINT NOT NULL,
+                                      o_orderstatus STRING NOT NULL,
+                                      o_totalprice DECIMAL(15, 2) NOT NULL,
+    o_orderdate DATE NOT NULL,
+    o_orderpriority STRING NOT NULL,
+    o_clerk STRING NOT NULL,
+    o_shippriority INTEGER NOT NULL,
+    o_comment STRING NOT NULL
+    )
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS partsupp (
-                                        ps_partkey BIGINT not null,
-                                        ps_suppkey BIGINT not null,
-                                        ps_availqty BIGINT not null,
-                                        ps_supplycost DECIMAL(15, 2) not null,
-    ps_comment STRING not null
-    ) CLUSTER BY (ps_partkey);
+                                        ps_partkey BIGINT NOT NULL,
+                                        ps_suppkey BIGINT NOT NULL,
+                                        ps_availqty BIGINT NOT NULL,
+                                        ps_supplycost DECIMAL(15, 2) NOT NULL,
+    ps_comment STRING NOT NULL
+    )
+    CLUSTER BY (ps_partkey);
 
 CREATE TABLE IF NOT EXISTS part (
-                                    p_partkey BIGINT not null,
-                                    p_name STRING not null,
-                                    p_mfgr STRING not null,
-                                    p_brand STRING not null,
-                                    p_type STRING not null,
-                                    p_size INTEGER not null,
-                                    p_container STRING not null,
-                                    p_retailprice DECIMAL(15, 2) not null,
-    p_comment STRING not null
-    ) CLUSTER BY (p_partkey);
+                                    p_partkey BIGINT NOT NULL,
+                                    p_name STRING NOT NULL,
+                                    p_mfgr STRING NOT NULL,
+                                    p_brand STRING NOT NULL,
+                                    p_type STRING NOT NULL,
+                                    p_size INTEGER NOT NULL,
+                                    p_container STRING NOT NULL,
+                                    p_retailprice DECIMAL(15, 2) NOT NULL,
+    p_comment STRING NOT NULL
+    )
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS region (
-                                      r_regionkey INTEGER not null,
-                                      r_name STRING not null,
+                                      r_regionkey INTEGER NOT NULL,
+                                      r_name STRING NOT NULL,
                                       r_comment STRING
-) CLUSTER BY (r_regionkey);
+)
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
 CREATE TABLE IF NOT EXISTS supplier (
-                                        s_suppkey BIGINT not null,
-                                        s_name STRING not null,
-                                        s_address STRING not null,
-                                        s_nationkey INTEGER not null,
-                                        s_phone STRING not null,
-                                        s_acctbal DECIMAL(15, 2) not null,
-    s_comment STRING not null
-    ) CLUSTER BY (s_suppkey);
+                                        s_suppkey BIGINT NOT NULL,
+                                        s_name STRING NOT NULL,
+                                        s_address STRING NOT NULL,
+                                        s_nationkey INTEGER NOT NULL,
+                                        s_phone STRING NOT NULL,
+                                        s_acctbal DECIMAL(15, 2) NOT NULL,
+    s_comment STRING NOT NULL
+    )
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';
 
+-- ETL
+COPY INTO customer
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/customer/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
 
-copy into lineitem from 's3://redshift-downloads/TPC-H/2.18/100GB/lineitem/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into nation from 's3://redshift-downloads/TPC-H/2.18/100GB/nation/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into orders from 's3://redshift-downloads/TPC-H/2.18/100GB/orders/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into part from 's3://redshift-downloads/TPC-H/2.18/100GB/part/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into partsupp from 's3://redshift-downloads/TPC-H/2.18/100GB/partsupp/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into region from 's3://redshift-downloads/TPC-H/2.18/100GB/region/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
-copy into supplier from 's3://redshift-downloads/TPC-H/2.18/100GB/supplier/' CONNECTION = (allow_anonymous='true' region='us-east-1')  file_format=(TYPE=CSV, field_delimiter='|');
+COPY INTO lineitem
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/lineitem/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO nation
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/nation/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO orders
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/orders/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO part
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/part/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO partsupp
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/partsupp/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO region
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/region/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
+
+COPY INTO supplier
+    FROM 's3://redshift-downloads/TPC-H/2.18/100GB/supplier/'
+    CONNECTION = (allow_anonymous = 'true', region = 'us-east-1')
+    FILE_FORMAT = (TYPE = CSV, FIELD_DELIMITER = '|');
