@@ -13,13 +13,14 @@ select
 from
 	lineitem
 where
-	l_shipdate <= DATEADD(day, 90, '1998-12-01')
+	l_shipdate <= DATEADD(day, -116, '1998-12-01')
 group by
 	l_returnflag,
 	l_linestatus
 order by
 	l_returnflag,
 	l_linestatus;
+
 -- TPC-H 2
 select
 	s_acctbal,
