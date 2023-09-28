@@ -12,4 +12,4 @@ Config as snowsql_config to  `~/.snowsql/config`
 
 # Run
 
-python3 ./snow.py
+python3 ./snow.py [--nosuspend]
