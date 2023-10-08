@@ -20,10 +20,10 @@ CREATE TABLE IF NOT EXISTS customer (
     ) ;
 
 create table customer (
-                          c_custkey int8 not null ,
+                          c_custkey INTEGER not null ,
                           c_name varchar(25) not null,
                           c_address varchar(40) not null,
-                          c_nationkey int4 not null,
+                          c_nationkey INTEGER not null,
                           c_phone char(15) not null,
                           c_acctbal numeric(12,2) not null,
                           c_mktsegment char(10) not null,
