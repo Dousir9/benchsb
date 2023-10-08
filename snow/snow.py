@@ -1,14 +1,14 @@
 import subprocess
 import re
 from pathlib import Path
-import sys
 import argparse  # Import argparse module
 
 
-def execute_sql(query):
+def execute_sql(query, warehouse):
+    """Execute an SQL query using snowsql."""
     command = [
         'snowsql',
-        '--warehouse', 'COMPUTE_WH',
+        '--warehouse', warehouse,
         '--schemaname', 'PUBLIC',
         '--dbname', 'tpch_sf100',
         '-q', query
@@ -16,25 +16,38 @@ def execute_sql(query):
 
     try:
         result = subprocess.run(command, text=True, capture_output=True, check=True)
+        return result.stdout
     except subprocess.CalledProcessError as e:
-        sys.exit(f"snowsql command failed: {e.stderr}")
-
-    return result.stdout
+        raise RuntimeError(f"snowsql command failed: {e.stderr}")
 
 
 def extract_time(output):
+    """Extract execution time from the snowsql output."""
     match = re.search(r'Time Elapsed:\s*([0-9.]+)s', output)
     return match.group(1) if match else None
 
 
+def restart_warehouse(warehouse):
+    """Restart a specific warehouse by suspending and then resuming it."""
+    alter_suspend = f"ALTER WAREHOUSE {warehouse} SUSPEND;"
+    alter_resume = f"ALTER WAREHOUSE {warehouse} RESUME;"
+
+    print(f"Suspending warehouse {warehouse}...")
+    execute_sql(alter_suspend, warehouse)
+
+    print(f"Resuming warehouse {warehouse}...")
+    execute_sql(alter_resume, warehouse)
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Execute SQL queries and optionally suspend the warehouse.')
+    parser = argparse.ArgumentParser(description='Execute SQL queries and optionally restart the warehouse.')
     parser.add_argument('--nosuspend', action='store_false', default=True,
                         dest='suspend', help='Do not run the alter statement to suspend the warehouse')
+    parser.add_argument('--warehouse', default='COMPUTE_WH', help='Specify the warehouse to use. Defaults to COMPUTE_WH')
     args = parser.parse_args()
 
-    alter_statement = "ALTER WAREHOUSE COMPUTE_WH SUSPEND;"
     sql_file_path = Path('./queries.sql')
+
     if not sql_file_path.exists():
         print("SQL file does not exist.")
         return
@@ -43,7 +56,6 @@ def main():
         content = f.read()
 
     queries = [query.strip() for query in content.split(';') if query.strip()]
-
     results = []
 
     with open('query_results.txt', 'w') as result_file:
@@ -51,26 +63,20 @@ def main():
             print(f"Executing SQL-{index + 1}: {query}")
 
             if args.suspend:  # Check if --nosuspend option is not present
-                print("Suspending warehouse...\n")
-                _ = execute_sql(alter_statement)
+                restart_warehouse(args.warehouse)
 
             print("Executing query...\n")
-            output = execute_sql(query)
+            output = execute_sql(query, args.warehouse)
 
-            if output:
-                time_elapsed = extract_time(output)
-                if time_elapsed:
-                    print(f"Time Elapsed: {time_elapsed}s\n")
-                    result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: {time_elapsed}s\n\n")
-                    results.append(f"{time_elapsed}")
-                else:
-                    print("Could not extract time from output.\n")
-                    result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: Unknown\n\n")
-                    results.append(f"SQL-{index + 1}: Unknown")
+            time_elapsed = extract_time(output)
+            if time_elapsed:
+                print(f"Time Elapsed: {time_elapsed}s\n")
+                result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: {time_elapsed}s\n\n")
+                results.append(time_elapsed)
             else:
-                print("No output from snowsql command.\n")
-                result_file.write(f"SQL-{index + 1}: {query}\nNo output\n\n")
-                results.append(f"SQL-{index + 1}: No output")
+                print("Could not extract time from output.\n")
+                result_file.write(f"SQL-{index + 1}: {query}\nTime Elapsed: Unknown\n\n")
+                results.append(f"SQL-{index + 1}: Unknown")
 
     print("Overall Execution Results:")
     for result in results:

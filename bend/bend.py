@@ -6,43 +6,50 @@ from pathlib import Path
 import argparse
 
 def execute_sql(query):
+    """Execute an SQL query using bendsql."""
     command = ['bendsql', '--query=' + query, '--time']
     try:
         result = subprocess.run(command, text=True, capture_output=True, check=True)
         return result.stdout
     except subprocess.CalledProcessError as e:
-        sys.exit(f"bendsql command failed: {e.stderr}")
+        raise RuntimeError(f"bendsql command failed: {e.stderr}")
 
 def extract_time(output):
+    """Extract execution time from the bendsql output."""
     match = re.search(r'([0-9.]+)$', output)
     if not match:
         raise ValueError("Could not extract time from output.")
     return match.group(1)
 
 def get_warehouse_from_env():
+    """Retrieve warehouse name from the environment variable."""
     dsn = os.environ.get('BENDSQL_DSN', '')
     match = re.search(r'--([\w-]+)\.gw', dsn)
     if not match:
-        raise ValueError("Could not extract warehouse name from BENDSQL_DSN.")
+        raise ValueError("Could not extract warehouse name from DATABEND_DSN.")
     return match.group(1)
 
-
-def suspend_warehouse(warehouse):
-    # Construct the SQL command to suspend the warehouse
-    suspend_sql = f"ALTER WAREHOUSE '{warehouse}' SUSPEND;"
+def restart_warehouse(warehouse):
+    """Suspend and then resume a warehouse."""
     try:
-        execute_sql(suspend_sql)
+        execute_sql(f"ALTER WAREHOUSE '{warehouse}' SUSPEND;")
         print(f"Warehouse {warehouse} suspended.")
+
+        execute_sql(f"ALTER WAREHOUSE '{warehouse}' RESUME;")
+        print(f"Warehouse {warehouse} resumed.")
     except Exception as e:
-        sys.exit(f"Failed to suspend warehouse {warehouse}: {e}")
+        raise RuntimeError(f"Failed to suspend/resume warehouse {warehouse}: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description='Execute SQL queries and optionally suspend the warehouse.')
-    parser.add_argument('--nosuspend', action='store_true',
-                        help='Do not suspend the warehouse before executing the query')
+    parser.add_argument('--nosuspend', action='store_true', help='Do not suspend the warehouse before executing the query')
+    parser.add_argument('--warehouse', default=None, help='Specify the warehouse to use. Defaults to value from DATABEND_DSN if not set')
     args = parser.parse_args()
 
-    warehouse = get_warehouse_from_env()
+    if args.warehouse:
+        warehouse = args.warehouse
+    else:
+        warehouse = get_warehouse_from_env()
 
     sql_file_path = Path('./queries.sql')
     if not sql_file_path.exists():
@@ -56,10 +63,9 @@ def main():
 
     with open('query_results.txt', 'w') as result_file:
         for index, query in enumerate(queries):
-
             # Suspend the warehouse before executing the query, unless --nosuspend is specified
             if not args.nosuspend:
-                suspend_warehouse(warehouse)
+                restart_warehouse(warehouse)
 
             try:
                 print(f"Executing SQL: {query}")
@@ -67,10 +73,10 @@ def main():
                 time_elapsed = extract_time(output)
                 print(f"Time Elapsed: {time_elapsed}s\n")
                 result_file.write(f"SQL: {query}\nTime Elapsed: {time_elapsed}s\n\n")
-                results.append(f"{time_elapsed}")
+                results.append(time_elapsed)
             except Exception as e:
                 print(e)
-                result_file.write(f"SQL: {query}\nTime Elapsed: Error - {e}\n\n")
+                result_file.write(f"SQL: {query}\nError: {e}\n\n")
                 results.append(f"{index + 1}|Error")
 
     print("Overall Execution Results:")
