@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 def execute_sql(query):
-    command = ['bendsql', '-q', query, '--time']
+    command = ['bendsql', '--query=' + query, '--time']
     try:
         result = subprocess.run(command, text=True, capture_output=True, check=True)
         return result.stdout

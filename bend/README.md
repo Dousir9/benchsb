@@ -1,5 +1,5 @@
 # bendsql
-
+>= v0.7.1
 https://github.com/datafuselabs/bendsql
 
 # Config
