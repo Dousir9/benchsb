@@ -4,6 +4,7 @@ import sys
 import os
 from pathlib import Path
 import argparse
+import time
 
 def execute_sql(query):
     """Execute an SQL query using bendsql."""
@@ -35,6 +36,7 @@ def restart_warehouse(warehouse):
         execute_sql(f"ALTER WAREHOUSE '{warehouse}' SUSPEND;")
         print(f"Warehouse {warehouse} suspended.")
 
+        time.sleep(5)
         execute_sql(f"ALTER WAREHOUSE '{warehouse}' RESUME;")
         print(f"Warehouse {warehouse} resumed.")
         execute_sql(f"SELECT 1;")
