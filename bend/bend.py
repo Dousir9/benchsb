@@ -71,6 +71,8 @@ def main():
                 restart_warehouse(warehouse)
 
             try:
+                # Add ignore_result to align with snowsql
+                query += f" ignore_result"
                 print(f"Executing SQL: {query}")
                 output = execute_sql(query)
                 time_elapsed = extract_time(output)
