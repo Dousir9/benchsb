@@ -14,4 +14,8 @@ export BENDSQL_DSN="databend://<user>:<pwd>@<host>:443/<database>"
 
 # Run
 
-python3 ./bend.py
+```
+python3 ./bend.py [--warehouse <warehousename>] [--nosuspend]
+```
+* `--warehouse`: warehouse name, default is fetch from BENDSQL_DSN.
+* `--nosuspend`: do not suspend warehouse after a query

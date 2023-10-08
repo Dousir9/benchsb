@@ -12,4 +12,9 @@ Config as snowsql_config to  `~/.snowsql/config`
 
 # Run
 
-python3 ./snow.py [--nosuspend]
+```
+python3 ./snow.py [--warehouse <warehousename>] [--nosuspend]
+```
+* `--warehouse`: warehouse name, default is `COMPUTE_WH`.
+* `--nosuspend`: do not suspend warehouse after a query
+
