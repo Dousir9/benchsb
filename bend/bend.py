@@ -37,6 +37,7 @@ def restart_warehouse(warehouse):
 
         execute_sql(f"ALTER WAREHOUSE '{warehouse}' RESUME;")
         print(f"Warehouse {warehouse} resumed.")
+        execute_sql(f"SELECT 1;")
     except Exception as e:
         raise RuntimeError(f"Failed to suspend/resume warehouse {warehouse}: {e}")
 

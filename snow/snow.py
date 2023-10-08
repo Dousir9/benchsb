@@ -37,6 +37,7 @@ def restart_warehouse(warehouse):
 
     print(f"Resuming warehouse {warehouse}...")
     execute_sql(alter_resume, warehouse)
+    execute_sql(f"SELECT 1;")
 
 
 def main():
