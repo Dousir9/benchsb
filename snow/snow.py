@@ -61,6 +61,8 @@ def main():
     queries = [query.strip() for query in content.split(';') if query.strip()]
     results = []
 
+    # Disable caching of results
+    execute_sql("ALTER ACCOUNT SET USE_CACHED_RESULT=FALSE;", args.warehouse)
     with open('query_results.txt', 'w') as result_file:
         for index, query in enumerate(queries):
             print(f"Executing SQL-{index + 1}: {query}")
