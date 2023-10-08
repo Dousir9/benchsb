@@ -2,6 +2,7 @@ import subprocess
 import re
 from pathlib import Path
 import argparse  # Import argparse module
+import time
 
 
 def execute_sql(query, warehouse):
@@ -35,6 +36,7 @@ def restart_warehouse(warehouse):
     print(f"Suspending warehouse {warehouse}...")
     execute_sql(alter_suspend, warehouse)
 
+    time.sleep(5)
     print(f"Resuming warehouse {warehouse}...")
     execute_sql(alter_resume, warehouse)
     execute_sql(f"SELECT 1;", warehouse)
