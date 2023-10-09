@@ -31,15 +31,13 @@ def extract_time(output):
 def restart_warehouse(warehouse):
     """Restart a specific warehouse by suspending and then resuming it."""
     alter_suspend = f"ALTER WAREHOUSE {warehouse} SUSPEND;"
-    alter_resume = f"ALTER WAREHOUSE {warehouse} RESUME;"
 
     print(f"Suspending warehouse {warehouse}...")
     execute_sql(alter_suspend, warehouse)
 
     time.sleep(5)
-    print(f"Resuming warehouse {warehouse}...")
-    execute_sql(alter_resume, warehouse)
     execute_sql(f"SELECT 1;", warehouse)
+    print(f"Resuming warehouse {warehouse}...")
 
 
 def main():
