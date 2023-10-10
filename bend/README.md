@@ -1,8 +1,12 @@
+# DatabendCloud
+
+[Apply for a free trial](https://databend.com/apply)
+
 # bendsql
 
 https://github.com/datafuselabs/bendsql
 
-** version >= v0.8.0**
+**version >= v0.8.0**
 
 # Config
 

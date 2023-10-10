@@ -1,3 +1,7 @@
+# Snowflake
+
+[Start for free](https://signup.snowflake.com/)
+
 # snowsql
 
 https://docs.snowflake.com/en/user-guide/snowsql
