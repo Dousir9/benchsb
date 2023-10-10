@@ -7,8 +7,8 @@ import argparse
 import time
 
 def execute_sql(query):
-    """Execute an SQL query using bendsql."""
-    command = ['bendsql', '--query=' + query, '--time']
+    """Execute an SQL query using bendsql(need >=0.8.0)."""
+    command = ['bendsql', '--query=' + query, '--time=server']
     try:
         result = subprocess.run(command, text=True, capture_output=True, check=True)
         return result.stdout
@@ -70,8 +70,6 @@ def main():
                 restart_warehouse(warehouse)
 
             try:
-                # Add ignore_result to align with snowsql
-                query += f" ignore_result"
                 print(f"Executing SQL: {query}")
                 output = execute_sql(query)
                 time_elapsed = extract_time(output)
