@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS partsupp (
                                         ps_supplycost DECIMAL(15, 2) NOT NULL,
     ps_comment STRING NOT NULL
     )
-    CLUSTER BY (ps_partkey);
+    STORAGE_FORMAT = 'native'
+    COMPRESSION = 'lz4';;
 
 CREATE TABLE IF NOT EXISTS part (
                                     p_partkey BIGINT NOT NULL,
